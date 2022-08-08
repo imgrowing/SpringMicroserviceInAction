@@ -1,7 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.12.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.3.12.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.google.cloud.tools.jib' version '3.2.1'
+    id 'java'
 }
 
 group = 'my'
@@ -9,26 +10,50 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+// usage: ./gradlew jibDockerBuild
+jib {
+    from {
+        image = "openjdk:11-slim"
+        platforms { // Apple M1을 위해 지정
+            platform {
+                architecture = "arm64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "license-server"
+        tags = ["latest"]
+    }
+    container {
+        jvmFlags = [
+                "-Xms256m",
+                "-Xmx512m"
+        ]
+//        ports = ['8080']  // port를 지정해 주지 않아도 정상 동작함
+    }
 }
