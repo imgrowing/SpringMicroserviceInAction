@@ -1,0 +1,22 @@
+example.property: I AM THE DEFAULT
+
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  database:
+    driverClassName: org.postgresql.Driver
+  datasource:
+    platform: postgres
+    testWhileIdle: true
+    validationQuery: SELECT 1
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web.exposure.include: '*'

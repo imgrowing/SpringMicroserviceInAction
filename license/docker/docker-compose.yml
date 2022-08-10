@@ -1,11 +1,47 @@
-version: '3.7'
 services:
+
+  database:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB:       "ostock_dev"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      backend:
+        aliases:
+          - "database"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  configserver:
+    image: config-server:latest
+    ports:
+      - "8071:8071"
+    networks:
+      backend:    # 서비스가 속한 네트워크 이름을 지정한다.
+        aliases:
+          - "configserver"  # 네트워크 상에서 이 서비스에 대한 대체 호스트 이름을 지정한다.
+
   licensingservice:
     image: license-server:latest
     ports:
       - "8080:8080"
     environment:
-      - "SPRING_PROFILES_ACTIVE=dev"
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CLOUD_CONFIG_URI: http://configserver:8071
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
     networks:
       backend:    # 서비스가 속한 네트워크 이름을 지정한다.
         aliases:
