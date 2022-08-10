@@ -1,5 +1,8 @@
 package my.study.license;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +13,19 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @SpringBootApplication
+@Slf4j
 public class LicenseApplication {
+
+	@Value("${example.property}")
+	private String exampleProperty;
 
 	public static void main(String[] args) {
 		SpringApplication.run(LicenseApplication.class, args);
+	}
+
+	@Bean
+	public CommandLineRunner commandLineRunner() {
+		return args -> log.warn("example.property: {}", exampleProperty);
 	}
 
 	@Bean

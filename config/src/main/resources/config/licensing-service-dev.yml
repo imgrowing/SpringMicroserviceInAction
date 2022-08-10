@@ -1,0 +1,8 @@
+example.property: I AM DEV
+
+spring:
+  datasource:
+#    url: jdbc:postgresql://localhost:5432/ostock_dev  # local 실행
+    url: jdbc:postgresql://database:5432/ostock_dev    # docker 실행
+    username: postgres
+    password: postgres
