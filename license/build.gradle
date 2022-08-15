@@ -67,8 +67,8 @@ jib {
     container {
         creationTime = "USE_CURRENT_TIMESTAMP"
         jvmFlags = [
-                "-Xms256m",
-                "-Xmx512m"
+//                "-Xms256m",
+//                "-Xmx512m"
         ]
 //        ports = ['8080']  // port를 지정해 주지 않아도 정상 동작함
     }

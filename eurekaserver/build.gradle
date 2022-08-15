@@ -19,7 +19,13 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.cloud:spring-cloud-config-server'
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-server') {
+		// 유지보수 모드인 ribbon을 사용하지 않고 spring cloud loadbalancer를 사용한다.
+		exclude group: 'org.springframework', module: 'cloud:spring-cloud-starter-ribbon'
+		exclude group: 'com.netflix.ribbon', module: 'ribbon-eureka'
+	}
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
@@ -47,7 +53,7 @@ jib {
 		}
 	}
 	to {
-		image = "config-server"
+		image = "eureka-server"
 		tags = ["latest"]
 	}
 	container {
