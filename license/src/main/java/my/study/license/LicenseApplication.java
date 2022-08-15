@@ -5,14 +5,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
 @SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
 @Slf4j
 public class LicenseApplication {
 
@@ -42,6 +48,12 @@ public class LicenseApplication {
 		messageSource.setUseCodeAsDefaultMessage(true); // 메시지가 발견되지 않아도 에러를 던지지 않고, 대신 메시지 코드를 반환한다.
 		messageSource.setBasenames("messages"); // 언어 프로퍼티 파일의 기본 이름을 지정한다. messages.properties
 		return messageSource;
+	}
+
+	@LoadBalanced
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 
 }

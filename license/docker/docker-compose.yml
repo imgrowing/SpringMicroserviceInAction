@@ -61,6 +61,23 @@ services:
         aliases:
           - "licenseservice"  # 네트워크 상에서 이 서비스에 대한 대체 호스트 이름을 지정한다.
 
+  organizationservice:
+    image: organization-server:latest
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CLOUD_CONFIG_URI: http://configserver:8071
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:    # 서비스가 속한 네트워크 이름을 지정한다.
+        aliases:
+            - "organizationserver"  # 네트워크 상에서 이 서비스에 대한 대체 호스트 이름을 지정한다.
+
 networks:
   backend:     # 커스텀 네트워크의 이름. default는 bridge이다.
     driver: bridge
