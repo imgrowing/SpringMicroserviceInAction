@@ -8,3 +8,20 @@ management:
       enabled: false    # default: true
     diskspace:
       enabled: true     # default: true
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      licenseService:
+        registerHealthIndicator: true             # health endpoint 를 통해 configuration 정보를 노출할지 여부. default false.
+        slidingWindowType: COUNT_BASED            # 슬라이딩 윈도우의 타입(COUNT_BASED or TIME_BASED). default COUNT_BASED.
+                                                  # 슬라이딩 윈도우는 CLOSED 상태에서의 호출 결과를 기록하는데 사용된다.
+                                                  # TIME_BASED 인경우에는 마지막 슬라이딩 윈도우 사이즈 만큼의 호출에 대한 집계를 저장한다.
+        slidingWindowSize: 20                     # 슬라이딩 윈도우 사이즈의 크기. default 100. COUNT_BASED 인 경우에는 갯수, TIME_BASED 인 경우에는 초(second).
+        mininumNumberOfCalls: 20                  # 호출의 실패율이나 느린 호출 비율을 판단하기 위해 필요한 최소한의 호출 수. default 100. 호출이 이 숫자보다 작은 시점에는 판단하지 않고 CLOSED 상태를 유지한다.
+        failureRateThreshold: 50                  # 호출 실패율의 임계치(percentage). default 50. 호출 실패율이 임계치 이상이면 OPEN 상태로 전이된다.
+        slowCallRateThreshold: 50                 # 느린 호출 비율의 임계치(percentage). default 100. 느린 호출 비율이 임계치 이상이면 OPEN 상태로 전이된다.
+        slowCallDurationThreshold: 2000           # 느린 호출로 간주되는 시간(ms)의 임계치. default 60000.
+        waitDurationInOpenStage: 60000            # OPEN 상태에서 이 시간(ms)이 지나야만 HALF_OPEN 상태로 전이된다. default 60000.
+        permittedNumberOfCallsInHalfOpenState: 10 # HALF_OPEN 상태에서 상황 판단을 위해 허용할 호출 횟수. default 10

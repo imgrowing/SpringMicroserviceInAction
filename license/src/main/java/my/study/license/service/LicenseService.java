@@ -1,5 +1,6 @@
 package my.study.license.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import my.study.license.config.ServiceConfig;
 import my.study.license.model.License;
@@ -13,7 +14,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Transactional(readOnly = true)
@@ -46,6 +51,41 @@ public class LicenseService {
             throw new IllegalArgumentException(String.format(message, licenseId, organizationId));
         }
         return license.withComment(config.getProperty());
+    }
+
+    @CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
+    public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
+        randomlyRunLong();
+        return licenseRepository.findByOrganizationId(organizationId);
+    }
+
+    private void randomlyRunLong() throws TimeoutException {
+        Random random = new Random();
+        int randomNum = random.nextInt(3) + 1;
+        if (randomNum != 3) {
+//            sleep();
+            throw new TimeoutException();
+        }
+    }
+
+    private void sleep() throws TimeoutException {
+        try {
+            Thread.sleep(5000);
+            throw new TimeoutException();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private List<License> buildFallbackLicenseList(String organizationId, Throwable e) {
+        License license = new License();
+        license.setLicenseId("0000000-00-00000");
+        license.setOrganizationId(organizationId);
+        license.setProductName("Sorry no licensing information currently available");
+
+        List<License> fallbackList = new ArrayList<>();
+        fallbackList.add(license);
+        return fallbackList;
     }
 
     public License getLicense(String licenseId, String organizationId, String clientType) {

@@ -21,6 +21,7 @@ repositories {
 
 ext {
     set('springCloudVersion', "Hoxton.SR12")
+    set('resilience4jVersion', "1.7.0") // 책과 동일하게 1.5.0으로 지정했으나 resilience4j-spring-boot2는 1.5.0으로, resilice4j는 최신버전인 1.7.0으로 주입되는 이슈가 있어 최신 버전으로 고정함.
 }
 
 dependencies {
@@ -31,6 +32,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation "io.github.resilience4j:resilience4j-spring-boot2:${resilience4jVersion}"
+    implementation "io.github.resilience4j:resilience4j-all:${resilience4jVersion}"
+    implementation "io.micrometer:micrometer-registry-prometheus" // /actuator/prometheus 에 p8s 메트릭을 노출해준다.
 
     runtimeOnly 'org.postgresql:postgresql'
 
