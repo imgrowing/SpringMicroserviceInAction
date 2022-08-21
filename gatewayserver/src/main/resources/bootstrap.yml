@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: gateway-server
+# JVM System Property나 OS Environment로 전달하므로, 여기서는 주석 처리함
+#  profiles:
+#    active: dev
+#  cloud:
+#    config:
+#      uri: http://localhost:8071

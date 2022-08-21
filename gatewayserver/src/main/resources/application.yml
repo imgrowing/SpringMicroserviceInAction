@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    loadbalancer.ribbon.enabled: false
+    gateway:
+      discovery.locator:  # 서비스 디스커버리를 이용한 자동 경로 매핑(service id를 사용용)
+        enabled: true
+        lowerCaseServiceId: true
+      routes:             # 서비스 디스커버리를 이용한 수동 경로 매핑
+        - id: organization-service-route    # optional. ID of the route
+          uri: lb://organization-service    # target service URI
+          predicates:
+            - Path=/organization/**
+          filters:        # 응답을 보내기 전이나 후에 요청이나 응답을 변경한다.
+            - RewritePath=/organization/(?<path>.*), /$\{path}  # request path를 재작성한다. "/organization/**" 로 유입되는 요청을 "/**" 형태로 변경
