@@ -25,3 +25,32 @@ resilience4j:
         slowCallDurationThreshold: 2000           # 느린 호출로 간주되는 시간(ms)의 임계치. default 60000.
         waitDurationInOpenStage: 60000            # OPEN 상태에서 이 시간(ms)이 지나야만 HALF_OPEN 상태로 전이된다. default 60000.
         permittedNumberOfCallsInHalfOpenState: 10 # HALF_OPEN 상태에서 상황 판단을 위해 허용할 호출 횟수. default 10
+
+resilience4j.ratelimiter:
+  instances:
+    licenseService:
+      limitForPeriod: 5
+      limitRefreshPeriod: 5000
+      timeoutDuration: 1000ms
+
+resilience4j.retry:
+  instances:
+    retryLicenseService:
+      maxRetryAttempts: 5
+      waitDuration: 10000
+      retry-exceptions:
+        - java.util.concurrent.TimeoutException
+
+resilience4j.bulkhead:
+  instances:
+    bulkheadLicenseService:
+      maxWaitDuration: 2ms
+      maxConcurrentCalls: 20
+
+
+resilience4j.thread-pool-bulkhead:
+  instances:
+    bulkheadLicenseService:
+      maxThreadPoolSize: 8
+      coreThreadPoolSize: 8
+      queueCapacity: 10

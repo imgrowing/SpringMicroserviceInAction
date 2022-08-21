@@ -1,6 +1,8 @@
 package my.study.license.service;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import my.study.license.config.ServiceConfig;
 import my.study.license.model.License;
@@ -9,6 +11,7 @@ import my.study.license.repository.LicenseRepository;
 import my.study.license.service.client.OrganizationDiscoveryClient;
 import my.study.license.service.client.OrganizationFeignClient;
 import my.study.license.service.client.OrganizationRestTemplateClient;
+import my.study.license.utils.UserContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -54,8 +57,13 @@ public class LicenseService {
     }
 
     @CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
+    @RateLimiter(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
+    @Retry(name = "retryLicenseService", fallbackMethod = "buildFallbackLicenseList")
+    //@Bulkhead(name = "bulkheadLicenseService", type= Bulkhead.Type.THREADPOOL, fallbackMethod = "buildFallbackLicenseList")
     public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
-        randomlyRunLong();
+        log.warn("getLicensesByOrganization =======================");
+        log.warn("getLicensesByOrganization Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
+//        randomlyRunLong();
         return licenseRepository.findByOrganizationId(organizationId);
     }
 
@@ -78,6 +86,9 @@ public class LicenseService {
     }
 
     private List<License> buildFallbackLicenseList(String organizationId, Throwable e) {
+        log.warn("buildFallbackLicenseList =======================");
+        log.warn("buildFallbackLicenseList Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
+
         License license = new License();
         license.setLicenseId("0000000-00-00000");
         license.setOrganizationId(organizationId);
