@@ -1,6 +1,7 @@
 package my.study.license;
 
 import lombok.extern.slf4j.Slf4j;
+import my.study.license.utils.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,10 +11,15 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 @SpringBootApplication
@@ -53,7 +59,18 @@ public class LicenseApplication {
 	@LoadBalanced
 	@Bean
 	public RestTemplate getRestTemplate() {
-		return new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();
+
+		List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
+
+		if (CollectionUtils.isEmpty(interceptors)) {
+			restTemplate.setInterceptors(Collections.singletonList(new UserContextInterceptor()));
+		} else {
+			interceptors.add(new UserContextInterceptor());
+			restTemplate.setInterceptors(interceptors);
+		}
+
+		return restTemplate;
 	}
 
 }
