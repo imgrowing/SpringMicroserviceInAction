@@ -62,11 +62,30 @@ services:
       backend:    # 서비스가 속한 네트워크 이름을 지정한다.
         aliases:
           - "gatewayserver"  # 네트워크 상에서 이 서비스에 대한 대체 호스트 이름을 지정한다.
+#  keycloak:
+#    image: alemairebe/keycloak:14.0.0
+#    restart: always
+#    environment:
+#      KEYCLOAK_USER: admin
+#      KEYCLOAK_PASSWORD: admin
+#    volumes:
+#      - ./realm-export.json:/opt/alemairebe/keycloak/realm-export.json
+#    command:
+#      - "-b 0.0.0.0"
+#      - "-Dkeycloak.import=/opt/alemairebe/keycloak/realm-export.json"
+#      - "-Dkeycloak.profile.feature.scripts=enabled"
+#      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      backend:
+#        aliases:
+#          - "keycloak"
 
   licensingservice:
     image: license-server:latest
     ports:
-      - "8080:8080"
+      - "8180:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_CLOUD_CONFIG_URI: http://configserver:8071

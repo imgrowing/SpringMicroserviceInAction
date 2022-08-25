@@ -1,1 +1,8 @@
-
+#keycloak:
+#  realm: spmia-realm
+#  auth-server-url: http://keycloak:8080/auth
+#  ssl-required: external
+#  resource: ostock           # client id
+#  credentials.secret: 39c3c630-873d-4888-86cd-3d2806cd3808
+#  use-resource-role-mappings: true
+#  bearer-only: true
